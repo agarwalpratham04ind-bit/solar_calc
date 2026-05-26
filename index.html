@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peanuts Store - Battery Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col justify-between">
+
+    <header class="bg-blue-600 text-white py-4 shadow-md text-center">
+        <h1 class="text-xl font-bold tracking-wide">🔋 Peanuts Battery Backup Estimator</h1>
+        <p class="text-xs text-blue-100 mt-1">Tailored for Eastman 48V 100Ah (4.8kWh)</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-6 w-full flex-grow my-4">
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
+                    🛑 Time Left Till 15%
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Current Battery %</label>
+                        <input type="number" id="dis_pct" min="16" max="100" placeholder="e.g., 50" 
+                            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Current Shop Load (Watts)</label>
+                        <input type="number" id="dis_load" min="1" placeholder="e.g., 500" 
+                            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6">
+                <button onclick="calculateDischarge()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-sm">
+                    Calculate Runtime
+                </button>
+                <div id="dis_result" class="mt-4 p-3 bg-blue-50 rounded-xl text-blue-900 font-medium text-center hidden"></div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
+                    ⚡ Charging Time Required
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Current Battery %</label>
+                        <input type="number" id="chg_pct" min="0" max="99" placeholder="e.g., 14" 
+                            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Solar / Charger Power (Watts)</label>
+                        <input type="number" id="chg_watts" min="1" placeholder="e.g., 2600" 
+                            class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-green-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6">
+                <button onclick="calculateCharge()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-xl transition duration-200 shadow-sm">
+                    Calculate Charge Time
+                </button>
+                <div id="chg_result" class="mt-4 p-3 bg-green-50 rounded-xl text-green-900 font-medium text-center hidden"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-4 text-xs text-gray-400 border-t bg-white">
+        Designed for Dad • Clean Energy Monitoring
+    </footer>
+
+    <script>
+        const TOTAL_CAPACITY_WH = 4800; // 48V * 100Ah = 4800Wh
+
+        function formatTime(decimalHours) {
+            if (decimalHours <= 0) return "0 mins";
+            const hours = Math.floor(decimalHours);
+            const minutes = Math.round((decimalHours - hours) * 60);
+            
+            if (hours === 0) return `${minutes} mins`;
+            return `${hours} hr ${minutes} mins`;
+        }
+
+        function calculateDischarge() {
+            const currentPct = parseFloat(document.getElementById('dis_pct').value);
+            const loadWatts = parseFloat(document.getElementById('dis_load').value);
+            const resultDiv = document.getElementById('dis_result');
+
+            if (!currentPct || !loadWatts || currentPct <= 15 || currentPct > 100 || loadWatts <= 0) {
+                resultDiv.className = "mt-4 p-3 bg-red-50 text-red-700 rounded-xl text-center font-medium";
+                resultDiv.innerText = "Please enter valid numbers (Battery % must be > 15).";
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Calculate usable capacity down to 15% threshold
+            const targetPct = 15;
+            const usablePctChange = currentPct - targetPct;
+            const usableEnergyWh = TOTAL_CAPACITY_WH * (usablePctChange / 100);
+            
+            // Time = Energy / Load
+            const hoursLeft = usableEnergyWh / loadWatts;
+
+            resultDiv.className = "mt-4 p-3 bg-blue-50 text-blue-900 rounded-xl text-center font-semibold text-lg";
+            resultDiv.innerText = `⏱️ Approx. ${formatTime(hoursLeft)} left until battery hits 15%`;
+            resultDiv.classList.remove('hidden');
+        }
+
+        function calculateCharge() {
+            const currentPct = parseFloat(document.getElementById('chg_pct').value);
+            const chgWatts = parseFloat(document.getElementById('chg_watts').value);
+            const resultDiv = document.getElementById('chg_result');
+
+            if (isNaN(currentPct) || !chgWatts || currentPct < 0 || currentPct >= 100 || chgWatts <= 0) {
+                resultDiv.className = "mt-4 p-3 bg-red-50 text-red-700 rounded-xl text-center font-medium";
+                resultDiv.innerText = "Please enter valid numbers (Battery % must be 0-99).";
+                resultDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Target is 100% full
+            const neededPctChange = 100 - currentPct;
+            let neededEnergyWh = TOTAL_CAPACITY_WH * (neededPctChange / 100);
+            
+            // Factor in ~10% loss for real-world conversion efficiency
+            neededEnergyWh = neededEnergyWh / 0.90;
+
+            const hoursRequired = neededEnergyWh / chgWatts;
+
+            resultDiv.className = "mt-4 p-3 bg-green-50 text-green-900 rounded-xl text-center font-semibold text-lg";
+            resultDiv.innerText = `⚡ Approx. ${formatTime(hoursRequired)} required to reach 100%`;
+            resultDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
