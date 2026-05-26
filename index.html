@@ -30,7 +30,7 @@
 
     <main class="px-4 py-6 flex-grow flex flex-col justify-center max-w-md mx-auto w-full">
         <div class="mb-6">
-            <h2 class="text-2xl font-bold tracking-tight text-white">Telemetry Control</h2>
+            <h2 class="text-2xl font-bold tracking-tight text-white">System Monitor</h2>
             <p class="text-xs text-slate-400 mt-1">Select mode for Eastman 4.8kWh calculations</p>
         </div>
 
@@ -70,14 +70,14 @@
     </main>
 
     <div class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-6 py-4 flex justify-between items-center z-30 max-w-md mx-auto rounded-t-2xl">
-        <div class="text-[10px] text-slate-500 font-medium">SYS: Eastman Node v2.2</div>
+        <div class="text-[10px] text-slate-500 font-medium">SYS: Eastman Node v2.3</div>
         <div class="text-[10px] text-slate-500 font-medium">Target Floor Operations</div>
     </div>
 
     <div id="dischargeModal" class="fixed inset-0 z-50 modal-bg flex items-start sm:items-center justify-center p-0 sm:p-4 hidden opacity-0 transition-opacity duration-200 overflow-y-auto">
         <div class="bg-slate-900 w-full max-w-md rounded-b-2xl sm:rounded-2xl border-b sm:border border-slate-800 shadow-2xl overflow-hidden transform -translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-200 mt-0 sm:mt-10">
             <div class="p-5 border-b border-slate-800/60 flex justify-between items-center">
-                <h3 class="tech-font text-base font-bold text-cyan-400 flex items-center gap-2">⚡ Discharge Telemetry</h3>
+                <h3 class="tech-font text-base font-bold text-cyan-400 flex items-center gap-2">⚡ Discharge Status</h3>
                 <button onclick="closeModal('dischargeModal')" class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 active:bg-slate-700 focus:outline-none">&times;</button>
             </div>
             <div class="p-5 space-y-4">
@@ -113,7 +113,7 @@
     <div id="chargeModal" class="fixed inset-0 z-50 modal-bg flex items-start sm:items-center justify-center p-0 sm:p-4 hidden opacity-0 transition-opacity duration-200 overflow-y-auto">
         <div class="bg-slate-900 w-full max-w-md rounded-b-2xl sm:rounded-2xl border-b sm:border border-slate-800 shadow-2xl overflow-hidden transform -translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-200 mt-0 sm:mt-10">
             <div class="p-5 border-b border-slate-800/60 flex justify-between items-center">
-                <h3 class="tech-font text-base font-bold text-emerald-400 flex items-center gap-2">🔋 Charge Telemetry</h3>
+                <h3 class="tech-font text-base font-bold text-emerald-400 flex items-center gap-2">🔋 Charge Status</h3>
                 <button onclick="closeModal('chargeModal')" class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 active:bg-slate-700 focus:outline-none">&times;</button>
             </div>
             <div class="p-5 space-y-4">
@@ -192,7 +192,7 @@
             const ampm = hours >= 12 ? 'PM' : 'AM';
             
             hours = hours % 12;
-            hours = hours ? hours : 12; // conversion of 0 to 12
+            hours = hours ? hours : 12;
             
             return `${hours}:${minutes} ${ampm}`;
         }
@@ -223,7 +223,6 @@
             resultDiv.className = "text-center font-bold text-base text-cyan-400 tech-font";
             resultDiv.innerText = `⏳ Duration: ${formatTime(hoursLeft)}`;
             
-            // Set Target Clock Time Output
             targetDiv.innerHTML = `🎯 Will hit reserve limit at <span class="text-cyan-400 font-bold">${getTargetClockTime(hoursLeft)}</span> today`;
 
             progressBar.className = "h-full transition-all duration-500 ease-out";
@@ -264,7 +263,6 @@
             resultDiv.className = "text-center font-bold text-base text-emerald-400 tech-font";
             resultDiv.innerText = `⚡ Duration: ${formatTime(hoursRequired)}`;
             
-            // Set Target Clock Time Output
             targetDiv.innerHTML = `🎯 Will reach 100% full at <span class="text-emerald-400 font-bold">${getTargetClockTime(hoursRequired)}</span>`;
 
             progressBar.className = "h-full transition-all duration-500 ease-out";
