@@ -19,7 +19,7 @@
     <header class="border-b border-slate-900 bg-slate-950/80 sticky top-0 z-40 backdrop-blur-md px-4 py-4">
         <div class="flex items-center justify-between">
             <h1 class="tech-font text-base font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-                PEANUTS SOLAR
+                PEANUTS SOLAR LABS
             </h1>
             <div class="flex items-center space-x-2 bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800">
                 <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -30,7 +30,7 @@
 
     <main class="px-4 py-6 flex-grow flex flex-col justify-center max-w-md mx-auto w-full">
         <div class="mb-6">
-            <h2 class="text-2xl font-bold tracking-tight text-white">Control Panel</h2>
+            <h2 class="text-2xl font-bold tracking-tight text-white">Telemetry Control</h2>
             <p class="text-xs text-slate-400 mt-1">Select mode for Eastman 4.8kWh calculations</p>
         </div>
 
@@ -70,14 +70,14 @@
     </main>
 
     <div class="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 px-6 py-4 flex justify-between items-center z-30 max-w-md mx-auto rounded-t-2xl">
-        <div class="text-[10px] text-slate-500 font-medium">SYS: Eastman Node v2.1</div>
+        <div class="text-[10px] text-slate-500 font-medium">SYS: Eastman Node v2.2</div>
         <div class="text-[10px] text-slate-500 font-medium">Target Floor Operations</div>
     </div>
 
     <div id="dischargeModal" class="fixed inset-0 z-50 modal-bg flex items-start sm:items-center justify-center p-0 sm:p-4 hidden opacity-0 transition-opacity duration-200 overflow-y-auto">
         <div class="bg-slate-900 w-full max-w-md rounded-b-2xl sm:rounded-2xl border-b sm:border border-slate-800 shadow-2xl overflow-hidden transform -translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-200 mt-0 sm:mt-10">
             <div class="p-5 border-b border-slate-800/60 flex justify-between items-center">
-                <h3 class="tech-font text-base font-bold text-cyan-400 flex items-center gap-2">⚡ Discharge Calculator</h3>
+                <h3 class="tech-font text-base font-bold text-cyan-400 flex items-center gap-2">⚡ Discharge Telemetry</h3>
                 <button onclick="closeModal('dischargeModal')" class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 active:bg-slate-700 focus:outline-none">&times;</button>
             </div>
             <div class="p-5 space-y-4">
@@ -97,6 +97,7 @@
                 
                 <div id="dis_wrapper" class="hidden mt-2 space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800/80">
                     <div id="dis_result" class="text-center font-bold text-base text-cyan-400 tech-font"></div>
+                    <div id="dis_time_target" class="text-center text-xs text-slate-300 font-medium tracking-wide border-t border-slate-800/60 pt-2"></div>
                     <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-800">
                         <div id="dis_progress" class="h-full w-0 transition-all duration-500 ease-out"></div>
                     </div>
@@ -112,7 +113,7 @@
     <div id="chargeModal" class="fixed inset-0 z-50 modal-bg flex items-start sm:items-center justify-center p-0 sm:p-4 hidden opacity-0 transition-opacity duration-200 overflow-y-auto">
         <div class="bg-slate-900 w-full max-w-md rounded-b-2xl sm:rounded-2xl border-b sm:border border-slate-800 shadow-2xl overflow-hidden transform -translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-200 mt-0 sm:mt-10">
             <div class="p-5 border-b border-slate-800/60 flex justify-between items-center">
-                <h3 class="tech-font text-base font-bold text-emerald-400 flex items-center gap-2">🔋 Charge Calculator</h3>
+                <h3 class="tech-font text-base font-bold text-emerald-400 flex items-center gap-2">🔋 Charge Telemetry</h3>
                 <button onclick="closeModal('chargeModal')" class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 active:bg-slate-700 focus:outline-none">&times;</button>
             </div>
             <div class="p-5 space-y-4">
@@ -132,6 +133,7 @@
                 
                 <div id="chg_wrapper" class="hidden mt-2 space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800/80">
                     <div id="chg_result" class="text-center font-bold text-base text-emerald-400 tech-font"></div>
+                    <div id="chg_time_target" class="text-center text-xs text-slate-300 font-medium tracking-wide border-t border-slate-800/60 pt-2"></div>
                     <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-800">
                         <div id="chg_progress" class="h-full w-0 transition-all duration-500 ease-out"></div>
                     </div>
@@ -147,7 +149,6 @@
     <script>
         const TOTAL_CAPACITY_WH = 4800; // 48V * 100Ah = 4800Wh
 
-        // Keyboard Safety: Drop down smoothly from top area
         function openModal(id) {
             const modal = document.getElementById(id);
             modal.classList.remove('hidden');
@@ -182,17 +183,33 @@
             return `${hours} hr ${minutes} mins`;
         }
 
+        function getTargetClockTime(decimalHours) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + Math.round(decimalHours * 60));
+            
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // conversion of 0 to 12
+            
+            return `${hours}:${minutes} ${ampm}`;
+        }
+
         function calculateDischarge() {
             const currentPct = parseFloat(document.getElementById('dis_pct').value);
             const loadWatts = parseFloat(document.getElementById('dis_load').value);
             const wrapper = document.getElementById('dis_wrapper');
             const resultDiv = document.getElementById('dis_result');
+            const targetDiv = document.getElementById('dis_time_target');
             const progressBar = document.getElementById('dis_progress');
 
             if (!currentPct || !loadWatts || currentPct <= 15 || currentPct > 100 || loadWatts <= 0) {
                 wrapper.classList.remove('hidden');
                 resultDiv.className = "text-center font-medium text-xs text-red-400";
                 resultDiv.innerText = "❌ Bounds Alert: Entry must be greater than 15%.";
+                targetDiv.innerText = "";
                 progressBar.style.width = "0%";
                 return;
             }
@@ -202,22 +219,22 @@
             const usableEnergyWh = TOTAL_CAPACITY_WH * (usablePctChange / 100);
             const hoursLeft = usableEnergyWh / loadWatts;
 
-            // Display values
             wrapper.classList.remove('hidden');
             resultDiv.className = "text-center font-bold text-base text-cyan-400 tech-font";
-            resultDiv.innerText = `⏳ Approx. ${formatTime(hoursLeft)} left`;
+            resultDiv.innerText = `⏳ Duration: ${formatTime(hoursLeft)}`;
+            
+            // Set Target Clock Time Output
+            targetDiv.innerHTML = `🎯 Will hit reserve limit at <span class="text-cyan-400 font-bold">${getTargetClockTime(hoursLeft)}</span> today`;
 
-            // Color code bar based on current percentage remaining
             progressBar.className = "h-full transition-all duration-500 ease-out";
             if (currentPct > 50) {
-                progressBar.classList.add('bg-emerald-500'); // Green
+                progressBar.classList.add('bg-emerald-500');
             } else if (currentPct > 30) {
-                progressBar.classList.add('bg-amber-500');   // Yellow/Orange
+                progressBar.classList.add('bg-amber-500');
             } else {
-                progressBar.classList.add('bg-red-500');     // Red danger zone
+                progressBar.classList.add('bg-red-500');
             }
             
-            // Set scale size
             setTimeout(() => { progressBar.style.width = `${currentPct}%`; }, 50);
         }
 
@@ -226,12 +243,14 @@
             const chgWatts = parseFloat(document.getElementById('chg_watts').value);
             const wrapper = document.getElementById('chg_wrapper');
             const resultDiv = document.getElementById('chg_result');
+            const targetDiv = document.getElementById('chg_time_target');
             const progressBar = document.getElementById('chg_progress');
 
             if (isNaN(currentPct) || !chgWatts || currentPct < 0 || currentPct >= 100 || chgWatts <= 0) {
                 wrapper.classList.remove('hidden');
                 resultDiv.className = "text-center font-medium text-xs text-red-400";
                 resultDiv.innerText = "❌ Bounds Alert: Entry must be 0-99.";
+                targetDiv.innerText = "";
                 progressBar.style.width = "0%";
                 return;
             }
@@ -243,9 +262,11 @@
 
             wrapper.classList.remove('hidden');
             resultDiv.className = "text-center font-bold text-base text-emerald-400 tech-font";
-            resultDiv.innerText = `⚡ Approx. ${formatTime(hoursRequired)} remaining`;
+            resultDiv.innerText = `⚡ Duration: ${formatTime(hoursRequired)}`;
+            
+            // Set Target Clock Time Output
+            targetDiv.innerHTML = `🎯 Will reach 100% full at <span class="text-emerald-400 font-bold">${getTargetClockTime(hoursRequired)}</span>`;
 
-            // Filling up bar from current charging progress state
             progressBar.className = "h-full transition-all duration-500 ease-out";
             if (currentPct < 30) {
                 progressBar.classList.add('bg-red-500');
