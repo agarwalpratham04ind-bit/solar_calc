@@ -3,739 +3,623 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#060a12">
+<meta name="theme-color" content="#000000">
 <title>Peanuts Solar — Battery Console</title>
 <style>
 :root{
-  --bg:#060a12;
-  --panel:#0c131e;
-  --panel-2:#111a27;
-  --line:#1c2a3a;
-  --line-soft:#16212e;
-  --text:#e6eef7;
-  --muted:#7d8fa3;
-  --dim:#4d5f73;
-  --cyan:#38e1ff;
-  --mint:#3ff2a0;
-  --amber:#ffb545;
-  --red:#ff5d5d;
+  --bg:#000308;
+  --panel:#070c14;
+  --panel-2:#0c1420;
+  --line:#16222f;
+  --line-soft:#0f1926;
+  --text:#e9f1f8;
+  --muted:#7488a0;
+  --dim:#455a72;
+  --cyan:#00e0ff;
+  --mint:#2bffb0;
+  --amber:#ff9236;
+  --red:#ff4d6d;
+  --accent:#00e0ff;
   --mono:ui-monospace,"SF Mono","JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --state:var(--mint);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;background:var(--bg)}
 body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--sans);
-  font-size:15px;
-  line-height:1.45;
-  min-height:100vh;
-  padding-bottom:env(safe-area-inset-bottom);
+  color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.45;
+  min-height:100vh;overflow-x:hidden;
   background-image:
-    radial-gradient(900px 500px at 80% -10%, rgba(56,225,255,.10), transparent 60%),
-    radial-gradient(700px 400px at 0% 100%, rgba(63,242,160,.07), transparent 60%),
-    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-  background-size:auto,auto,44px 44px,44px 44px;
+    radial-gradient(1000px 600px at 50% -15%, rgba(0,224,255,.13), transparent 62%),
+    radial-gradient(700px 500px at 110% 110%, rgba(43,255,176,.07), transparent 60%),
+    linear-gradient(rgba(255,255,255,.016) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.016) 1px,transparent 1px);
+  background-size:auto,auto,46px 46px,46px 46px;
+  background-attachment:fixed;
 }
-.wrap{max-width:1080px;margin:0 auto;padding:0 14px 40px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 
-/* ---------- header ---------- */
 header{
-  position:sticky;top:0;z-index:40;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:14px 14px 12px;
-  background:rgba(6,10,18,.82);
-  backdrop-filter:blur(14px);
+  position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:10px;
+  padding:14px 16px 12px;background:rgba(0,3,8,.8);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line-soft);
 }
-.brand{display:flex;align-items:baseline;gap:9px;min-width:0}
-.brand b{
-  font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.14em;
-  text-transform:uppercase;white-space:nowrap;
-}
-.brand span{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em}
-.hdr-actions{display:flex;align-items:center;gap:8px}
-.pill{
-  display:inline-flex;align-items:center;gap:6px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--muted);background:var(--panel);border:1px solid var(--line);
-  padding:5px 9px;border-radius:999px;
-}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--state);box-shadow:0 0 8px var(--state)}
-.icon-btn{
-  width:34px;height:34px;border-radius:10px;border:1px solid var(--line);
-  background:var(--panel);color:var(--muted);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-}
-.icon-btn:active{background:var(--panel-2)}
-.icon-btn:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.back{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);display:none;align-items:center;justify-content:center;flex:none;color:var(--muted)}
+.back.show{display:flex}
+.title{flex:1;min-width:0}
+.title b{display:block;font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title span{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+.gear{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;justify-content:center;color:var(--muted);flex:none}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px 44px}
 
-/* ---------- panels ---------- */
-.panel{
-  background:linear-gradient(180deg,var(--panel),rgba(12,19,30,.75));
-  border:1px solid var(--line);border-radius:16px;
-  margin-top:14px;overflow:hidden;
-}
-.panel-head{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:11px 14px;border-bottom:1px solid var(--line-soft);
-}
-.eyebrow{
-  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
-}
+.screen{display:none}
+.screen.active{display:block;animation:rise .34s cubic-bezier(.2,.8,.3,1)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.dial-shell{position:relative;display:flex;justify-content:center;margin:8px 0 2px;touch-action:none}
+.dial{width:min(84vw,320px);height:min(84vw,320px);display:block;cursor:grab}
+.dial:active{cursor:grabbing}
+.dial-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.dial-center .lab{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+.dial-center .big{font-family:var(--mono);font-size:clamp(48px,17vw,74px);font-weight:700;letter-spacing:-.04em;line-height:1;margin:4px 0 2px}
+.dial-center .big i{font-style:normal;font-size:.32em;color:var(--dim);margin-left:3px}
+.dial-center .sub{font-family:var(--mono);font-size:11.5px;color:var(--accent)}
+.rot{transform-origin:130px 130px;animation:spin 30s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.nudge{display:flex;justify-content:center;gap:10px;margin-top:2px}
+.nudge button{width:46px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--panel);font-family:var(--mono);font-size:17px;color:var(--muted)}
+.nudge button:active{background:var(--panel-2)}
+.hint{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#33465c;margin-top:10px}
+
+.doors{display:grid;gap:12px;margin-top:22px}
+@media(min-width:640px){.doors{grid-template-columns:1fr 1fr}}
+.door{position:relative;overflow:hidden;text-align:left;width:100%;border:1px solid var(--line);border-radius:18px;background:var(--panel);
+  padding:20px 18px;display:flex;align-items:center;gap:15px;transition:transform .16s ease,border-color .2s ease}
+.door:active{transform:scale(.985)}
+.door::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .25s ease;pointer-events:none;
+  background:radial-gradient(240px 130px at 82% 0%,var(--c),transparent 70%)}
+.door:hover{border-color:var(--c)}
+.door:hover::after{opacity:.15}
+.door .glyph{width:54px;height:54px;border-radius:15px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--c);color:var(--c);background:rgba(255,255,255,.02)}
+.door h3{margin:0;font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.door p{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+.door .go{margin-left:auto;font-family:var(--mono);color:var(--c);font-size:15px;flex:none}
+.door.discharge{--c:var(--amber)}
+.door.charge{--c:var(--mint)}
+.door[disabled]{opacity:.4;pointer-events:none}
+
+.bank-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;padding:12px 14px;border:1px solid var(--line-soft);border-radius:14px;background:var(--panel)}
+.bank-strip .k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.bank-strip .v{font-family:var(--mono);font-size:13.5px;font-weight:700;margin-top:2px}
+
+.panel{border:1px solid var(--line);border-radius:16px;background:var(--panel);margin-top:13px;overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line-soft)}
+.eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
 .panel-body{padding:14px}
 
-/* ---------- hero ---------- */
-.hero{display:grid;grid-template-columns:74px 1fr;gap:16px;align-items:stretch}
-.column{
-  display:flex;flex-direction:column-reverse;gap:3px;
-  padding:8px;border:1px solid var(--line);border-radius:12px;background:#080d16;
-}
-.seg{flex:1;border-radius:3px;background:#121c29;transition:background .35s ease, box-shadow .35s ease}
-.seg.on{background:var(--state);box-shadow:0 0 10px -1px var(--state)}
-.seg.reserve{background:#2a1520}
-.seg.reserve.on{background:var(--red);box-shadow:0 0 10px -1px var(--red)}
-.readout{display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0}
-.state-line{display:flex;align-items:center;gap:8px}
-.state{
-  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--state);
-}
-.soc{
-  font-family:var(--mono);font-weight:700;letter-spacing:-.03em;
-  font-size:clamp(46px,15vw,76px);line-height:.92;
-}
-.soc small{font-size:.34em;color:var(--dim);letter-spacing:0;margin-left:4px}
-.net{font-family:var(--mono);font-size:14px;color:var(--muted);margin-top:6px}
-.net b{color:var(--text)}
-.eta{
-  margin-top:10px;padding:10px 12px;border-radius:12px;
-  background:#080d16;border:1px solid var(--line-soft);
-}
-.eta .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
-.eta .v{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--state);margin-top:2px}
-.eta .s{font-size:12px;color:var(--muted);margin-top:1px}
-
-/* ---------- horizon chart ---------- */
-.chart{width:100%;height:150px;display:block}
-.chart-legend{
-  display:flex;gap:14px;flex-wrap:wrap;padding:0 14px 12px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--dim);text-transform:uppercase;
-}
-.chart-legend i{display:inline-block;width:16px;height:2px;vertical-align:middle;margin-right:5px}
-
-/* ---------- controls ---------- */
-.field{margin-bottom:16px}
-.field:last-child{margin-bottom:0}
-.field-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px}
+.field-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
 label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.val-in{
-  width:112px;background:#080d16;border:1px solid var(--line);border-radius:9px;
-  color:var(--text);font-family:var(--mono);font-size:16px;font-weight:600;
-  padding:7px 10px;text-align:right;
-}
+.val-in{width:120px;background:#020509;border:1px solid var(--line);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:16px;font-weight:600;padding:8px 11px;text-align:right;-moz-appearance:textfield}
 .val-in::-webkit-outer-spin-button,.val-in::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.val-in{-moz-appearance:textfield}
-input[type=range]{
-  -webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;margin:0;
-}
-input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:#16212e;border:1px solid var(--line)}
-input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:#16212e;border:1px solid var(--line)}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;margin-top:-9px;
-  background:var(--cyan);border:3px solid #060a12;box-shadow:0 0 12px -2px var(--cyan);cursor:pointer;
-}
-input[type=range]::-moz-range-thumb{
-  width:20px;height:20px;border-radius:50%;background:var(--cyan);border:3px solid #060a12;cursor:pointer;
-}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-.chip{
-  font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;
-  background:#0a1119;border:1px solid var(--line);color:var(--muted);
-}
-.chip:active{background:var(--panel-2)}
-.chip.sel{border-color:var(--cyan);color:var(--cyan);background:rgba(56,225,255,.08)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:#0f1926;border:1px solid var(--line)}
+input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:#0f1926;border:1px solid var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;margin-top:-9px;background:var(--accent);border:3px solid #000308;box-shadow:0 0 14px -2px var(--accent)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:3px solid #000308}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{font-family:var(--mono);font-size:11px;padding:6px 10px;border-radius:9px;background:#04080e;border:1px solid var(--line);color:var(--muted)}
+.chip.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,255,255,.05)}
 
-/* ---------- stats ---------- */
+.verdict{padding:18px 16px;text-align:center;border-bottom:1px solid var(--line-soft)}
+.verdict .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.verdict .big{font-family:var(--mono);font-size:clamp(34px,10vw,46px);font-weight:700;letter-spacing:-.03em;color:var(--accent);line-height:1.05;margin:6px 0 4px}
+.verdict .sub{font-size:13px;color:var(--muted)}
+.verdict .sub b{color:var(--text);font-weight:600}
+
+.chart{width:100%;height:158px;display:block}
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line-soft)}
-.stat{background:var(--panel);padding:13px 14px}
-.stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
-.stat .v{font-family:var(--mono);font-size:20px;font-weight:700;margin-top:3px}
-.stat .v span{font-size:11px;color:var(--dim);font-weight:500;margin-left:3px}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--panel);padding:12px 14px}
+.stat .k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.stat .v{font-family:var(--mono);font-size:19px;font-weight:700;margin-top:3px}
+.stat .v i{font-style:normal;font-size:11px;color:var(--dim);font-weight:500;margin-left:3px}
 
-/* ---------- table ---------- */
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
-th{
-  text-align:left;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-  font-weight:500;padding:0 14px 8px;
-}
+th{text-align:left;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:500;padding:0 14px 8px}
 td{padding:9px 14px;border-top:1px solid var(--line-soft)}
 td:last-child,th:last-child{text-align:right}
-tr.now td{background:rgba(56,225,255,.06)}
-tr.now td:first-child{box-shadow:inset 2px 0 0 var(--cyan)}
+tr.now td{background:rgba(255,255,255,.04)}
+tr.now td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
 
-/* ---------- alerts ---------- */
-.alert{
-  display:flex;gap:10px;align-items:flex-start;
-  padding:11px 13px;border-radius:12px;margin-top:9px;font-size:13px;line-height:1.4;
-  border:1px solid;
-}
-.alert b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
-.alert.warn{background:rgba(255,181,69,.07);border-color:rgba(255,181,69,.3);color:#ffd79a}
-.alert.crit{background:rgba(255,93,93,.08);border-color:rgba(255,93,93,.32);color:#ffb3b3}
-.alert.ok{background:rgba(63,242,160,.06);border-color:rgba(63,242,160,.25);color:#a8f5d2}
+.alert{display:flex;padding:11px 13px;border-radius:13px;margin-top:10px;font-size:13px;border:1px solid}
+.alert b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
+.alert.warn{background:rgba(255,146,54,.07);border-color:rgba(255,146,54,.3);color:#ffd3a8}
+.alert.crit{background:rgba(255,77,109,.08);border-color:rgba(255,77,109,.32);color:#ffb0bf}
+.alert.ok{background:rgba(43,255,176,.055);border-color:rgba(43,255,176,.24);color:#a5f7d8}
 
-/* ---------- buttons ---------- */
-.btn{
-  width:100%;padding:13px;border-radius:12px;cursor:pointer;border:1px solid var(--line);
-  background:var(--panel-2);color:var(--text);
-  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-}
+.btn{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.btn.primary{background:var(--accent);color:#001318;border-color:var(--accent)}
 .btn:active{transform:scale(.99)}
-.btn.primary{background:var(--cyan);color:#04202a;border-color:var(--cyan)}
-.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
 
-/* ---------- settings sheet ---------- */
-.scrim{
-  position:fixed;inset:0;z-index:50;background:rgba(4,7,12,.72);backdrop-filter:blur(6px);
-  opacity:0;pointer-events:none;transition:opacity .2s ease;
-}
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(0,2,6,.75);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .2s}
 .scrim.open{opacity:1;pointer-events:auto}
-.sheet{
-  position:fixed;left:0;right:0;bottom:0;z-index:51;max-height:88vh;overflow-y:auto;
-  background:var(--panel);border-top:1px solid var(--line);
-  border-radius:20px 20px 0 0;padding:6px 16px calc(24px + env(safe-area-inset-bottom));
-  transform:translateY(102%);transition:transform .26s cubic-bezier(.3,.9,.3,1);
-}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;max-height:88vh;overflow-y:auto;background:var(--panel);
+  border-top:1px solid var(--line);border-radius:22px 22px 0 0;padding:6px 16px calc(24px + env(safe-area-inset-bottom));
+  transform:translateY(102%);transition:transform .26s cubic-bezier(.3,.9,.3,1);max-width:900px;margin:0 auto}
 .sheet.open{transform:translateY(0)}
-.grabber{width:38px;height:4px;border-radius:99px;background:var(--line);margin:8px auto 14px}
+.grabber{width:38px;height:4px;border-radius:99px;background:var(--line);margin:9px auto 14px}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
 .srow:last-of-type{border-bottom:0}
 .srow .lab{font-size:13.5px}
-.srow .hint{font-size:11px;color:var(--dim);margin-top:1px}
-.srow input[type=number]{
-  width:96px;background:#080d16;border:1px solid var(--line);border-radius:9px;color:var(--text);
-  font-family:var(--mono);font-size:16px;padding:7px 9px;text-align:right;flex:none;
-}
-.toggle{width:46px;height:26px;border-radius:99px;background:#16212e;border:1px solid var(--line);position:relative;cursor:pointer;flex:none}
-.toggle i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--dim);transition:all .18s ease}
-.toggle.on{background:rgba(63,242,160,.18);border-color:var(--mint)}
+.srow .hint2{font-size:11px;color:var(--dim);margin-top:1px}
+.srow input{width:98px;background:#020509;border:1px solid var(--line);border-radius:10px;color:var(--text);font-family:var(--mono);font-size:16px;padding:8px 10px;text-align:right;flex:none}
+.toggle{width:46px;height:26px;border-radius:99px;background:#0f1926;border:1px solid var(--line);position:relative;flex:none;cursor:pointer}
+.toggle i{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--dim);transition:all .18s}
+.toggle.on{background:rgba(43,255,176,.16);border-color:var(--mint)}
 .toggle.on i{left:22px;background:var(--mint)}
 
-footer{
-  margin-top:20px;text-align:center;
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#33445a;text-transform:uppercase;
-}
-.toast{
-  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:60;
-  background:var(--mint);color:#04231a;font-family:var(--mono);font-size:12px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;border-radius:99px;
-  opacity:0;pointer-events:none;transition:all .22s ease;
-}
+.toast{position:fixed;left:50%;bottom:26px;z-index:60;transform:translate(-50%,18px);background:var(--mint);color:#00281c;
+  font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:10px 17px;border-radius:99px;opacity:0;pointer-events:none;transition:all .22s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-
-@media (min-width:760px){
-  .cols{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start}
-  .cols>.panel{margin-top:0}
-  .cols{margin-top:14px}
-  .stats{grid-template-columns:repeat(4,1fr)}
-  .hero{grid-template-columns:90px 1fr}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+footer{margin-top:22px;text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:#2b3a4c;text-transform:uppercase}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <b>Peanuts Solar</b><span id="bankLabel">5.12 kWh · 51.2 V</span>
-  </div>
-  <div class="hdr-actions">
-    <span class="pill"><span class="dot"></span><span id="statePill">Live</span></span>
-    <button class="icon-btn" id="btnSettings" aria-label="Open system settings">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
-    </button>
-  </div>
+  <button class="back" id="btnBack" aria-label="Back to home">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <div class="title"><b id="hTitle">Peanuts Solar</b><span id="hSub">Eastman 5.12 kWh · 51.2 V</span></div>
+  <button class="gear" id="btnSettings" aria-label="System settings">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+  </button>
 </header>
 
 <div class="wrap">
 
-  <!-- HERO -->
-  <section class="panel">
-    <div class="panel-body">
-      <div class="hero">
-        <div class="column" id="column" aria-hidden="true"></div>
-        <div class="readout">
-          <div class="state-line"><span class="state" id="stateText">Discharging</span></div>
-          <div class="soc"><span id="socBig">62</span><small>%</small></div>
-          <div class="net">Battery flow <b id="netText">−540 W</b> · <span id="ampText">10.5 A</span></div>
-          <div class="eta">
-            <div class="k" id="etaLabel">Reaches 15% reserve</div>
-            <div class="v" id="etaTime">4 h 26 m</div>
-            <div class="s" id="etaClock">around 6:42 PM today</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="cols">
-
-    <!-- CONTROLS -->
-    <section class="panel">
-      <div class="panel-head"><span class="eyebrow">Right now</span><span class="eyebrow" id="clockNow">--:--</span></div>
-      <div class="panel-body">
-
-        <div class="field">
-          <div class="field-top">
-            <label for="soc">State of charge</label>
-            <input class="val-in" type="number" id="socNum" min="0" max="100" step="1" value="62" inputmode="numeric">
-          </div>
-          <input type="range" id="soc" min="0" max="100" step="1" value="62">
-        </div>
-
-        <div class="field">
-          <div class="field-top">
-            <label for="loadNum">Shop load</label>
-            <input class="val-in" type="number" id="loadNum" min="0" max="10000" step="10" value="540" inputmode="numeric">
-          </div>
-          <input type="range" id="load" min="0" max="5000" step="10" value="540">
-          <div class="chips" id="loadChips"></div>
-        </div>
-
-        <div class="field">
-          <div class="field-top">
-            <label for="pvNum">Solar input</label>
-            <input class="val-in" type="number" id="pvNum" min="0" max="10000" step="10" value="0" inputmode="numeric">
-          </div>
-          <input type="range" id="pv" min="0" max="5000" step="10" value="0">
-          <div class="chips" id="pvChips"></div>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn" id="btnReset">Reset</button>
-          <button class="btn primary" id="btnCopy">Copy status</button>
-        </div>
-      </div>
-    </section>
-
-    <div>
-      <!-- HORIZON -->
-      <section class="panel">
-        <div class="panel-head"><span class="eyebrow">12-hour projection</span><span class="eyebrow" id="horizonNote">at current load</span></div>
-        <svg class="chart" id="chart" viewBox="0 0 600 150" preserveAspectRatio="none" role="img" aria-label="Projected state of charge over the next 12 hours"></svg>
-        <div class="chart-legend">
-          <span><i style="background:var(--state)"></i>Projected charge</span>
-          <span><i style="background:var(--red)"></i>Reserve floor</span>
-        </div>
-      </section>
-
-      <!-- STATS -->
-      <section class="panel">
-        <div class="panel-head"><span class="eyebrow">Energy in the bank</span></div>
-        <div class="stats">
-          <div class="stat"><div class="k">Usable above reserve</div><div class="v" id="statUsable">2.4<span>kWh</span></div></div>
-          <div class="stat"><div class="k">Needed to fill</div><div class="v" id="statToFull">1.9<span>kWh</span></div></div>
-          <div class="stat"><div class="k">Battery current</div><div class="v" id="statAmp">10.5<span>A</span></div></div>
-          <div class="stat"><div class="k">C-rate</div><div class="v" id="statC">0.11<span>C</span></div></div>
-        </div>
-      </section>
+<!-- ================= HOME ================= -->
+<section class="screen active" id="scHome">
+  <div class="dial-shell">
+    <svg class="dial" id="dial" viewBox="0 0 260 260" role="slider" aria-label="State of charge" aria-valuemin="0" aria-valuemax="100" aria-valuenow="62" tabindex="0"></svg>
+    <div class="dial-center">
+      <div class="lab">State of charge</div>
+      <div class="big" id="dialPct">62<i>%</i></div>
+      <div class="sub" id="dialWh">3.17 kWh in the bank</div>
     </div>
   </div>
 
-  <!-- ALERTS -->
-  <div id="alerts"></div>
+  <div class="nudge">
+    <button id="nMinus" aria-label="Lower by one percent">−</button>
+    <button id="nPlus" aria-label="Raise by one percent">+</button>
+  </div>
+  <div class="hint">Drag the ring to match the inverter reading</div>
 
-  <!-- RUNTIME TABLE -->
-  <section class="panel">
-    <div class="panel-head"><span class="eyebrow">Runtime if the load changes</span><span class="eyebrow">to reserve floor</span></div>
-    <div style="padding:12px 0 6px">
-      <table>
-        <thead><tr><th>Load</th><th>Battery draw</th><th>Runtime left</th></tr></thead>
-        <tbody id="runtimeRows"></tbody>
-      </table>
+  <div class="doors">
+    <button class="door discharge" id="goDischarge">
+      <span class="glyph"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M13 3L4 14h7l-1 7 9-11h-7l1-7z"/></svg></span>
+      <span><h3>Discharging</h3><p>Running on battery — how long until the reserve floor?</p></span>
+      <span class="go">→</span>
+    </button>
+    <button class="door charge" id="goCharge">
+      <span class="glyph"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9m0 0l-3.5 3.5M12 12l3.5 3.5"/><path d="M6.5 9a5.5 5.5 0 1 1 10.4 2.2"/></svg></span>
+      <span><h3>Charging</h3><p>Solar is in — how long until the bank is full?</p></span>
+      <span class="go">→</span>
+    </button>
+  </div>
+
+  <div class="bank-strip">
+    <div><div class="k">Bank</div><div class="v" id="bsCap">5.12 kWh</div></div>
+    <div><div class="k">Usable</div><div class="v" id="bsUsable">2.40 kWh</div></div>
+    <div><div class="k">Floor</div><div class="v" id="bsFloor">15%</div></div>
+    <div><div class="k">To fill</div><div class="v" id="bsRoom">1.95 kWh</div></div>
+  </div>
+</section>
+
+<!-- ================= DISCHARGE ================= -->
+<section class="screen" id="scDis">
+  <div class="panel">
+    <div class="verdict">
+      <div class="k">Time until <span id="dFloorLbl">15%</span> reserve</div>
+      <div class="big" id="dBig">4 h 26 m</div>
+      <div class="sub" id="dSub">Hits the floor around <b>6:42 PM</b></div>
     </div>
-  </section>
+    <svg class="chart" id="dChart" viewBox="0 0 600 158" preserveAspectRatio="none" role="img" aria-label="Projected discharge curve"></svg>
+    <div class="stats">
+      <div class="stat"><div class="k">Usable energy</div><div class="v" id="dUsable">2.40<i>kWh</i></div></div>
+      <div class="stat"><div class="k">Battery draw</div><div class="v" id="dDraw">587<i>W</i></div></div>
+      <div class="stat"><div class="k">Current</div><div class="v" id="dAmp">11.5<i>A</i></div></div>
+      <div class="stat"><div class="k">C-rate</div><div class="v" id="dC">0.11<i>C</i></div></div>
+    </div>
+  </div>
 
-  <footer>Eastman node · works offline · figures are estimates</footer>
+  <div class="panel">
+    <div class="panel-head"><span class="eyebrow">Shop load</span><span class="eyebrow" id="dSocEcho">at 62%</span></div>
+    <div class="panel-body">
+      <div class="field-top">
+        <label for="dLoadNum">Watts running</label>
+        <input class="val-in" type="number" id="dLoadNum" min="0" max="20000" step="10" value="540" inputmode="numeric">
+      </div>
+      <input type="range" id="dLoad" min="0" max="5000" step="10" value="540" aria-label="Shop load in watts">
+      <div class="chips" id="dChips"></div>
+      <div class="btn-row">
+        <button class="btn" id="dHome">Change charge %</button>
+        <button class="btn primary" id="dCopy">Copy status</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dAlerts"></div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="eyebrow">If the load changes</span><span class="eyebrow">runtime left</span></div>
+    <div style="padding:12px 0 6px">
+      <table><thead><tr><th>Load</th><th>Draw</th><th>Runtime</th></tr></thead><tbody id="dRows"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHARGE ================= -->
+<section class="screen" id="scChg">
+  <div class="panel">
+    <div class="verdict">
+      <div class="k">Time until 100% full</div>
+      <div class="big" id="cBig">2 h 05 m</div>
+      <div class="sub" id="cSub">Full around <b>2:18 PM</b></div>
+    </div>
+    <svg class="chart" id="cChart" viewBox="0 0 600 158" preserveAspectRatio="none" role="img" aria-label="Projected charge curve"></svg>
+    <div class="stats">
+      <div class="stat"><div class="k">Energy to fill</div><div class="v" id="cRoom">1.95<i>kWh</i></div></div>
+      <div class="stat"><div class="k">Into battery</div><div class="v" id="cInto">2340<i>W</i></div></div>
+      <div class="stat"><div class="k">Current</div><div class="v" id="cAmp">45.7<i>A</i></div></div>
+      <div class="stat"><div class="k">C-rate</div><div class="v" id="cC">0.46<i>C</i></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="eyebrow">Charger output</span><span class="eyebrow" id="cSocEcho">at 62%</span></div>
+    <div class="panel-body">
+      <div class="field-top">
+        <label for="cWattNum">Watts coming in</label>
+        <input class="val-in" type="number" id="cWattNum" min="0" max="20000" step="10" value="2600" inputmode="numeric">
+      </div>
+      <input type="range" id="cWatt" min="0" max="6000" step="10" value="2600" aria-label="Charger output in watts">
+      <div class="chips" id="cChips"></div>
+      <div class="btn-row">
+        <button class="btn" id="cHome">Change charge %</button>
+        <button class="btn primary" id="cCopy">Copy status</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cAlerts"></div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="eyebrow">Milestones</span><span class="eyebrow">clock time</span></div>
+    <div style="padding:12px 0 6px">
+      <table><thead><tr><th>Level</th><th>From now</th><th>At</th></tr></thead><tbody id="cRows"></tbody></table>
+    </div>
+  </div>
+</section>
+
+<footer>Works offline · figures are estimates, not a BMS reading</footer>
 </div>
 
-<!-- SETTINGS -->
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-label="System settings">
   <div class="grabber"></div>
-  <div class="eyebrow" style="margin-bottom:6px">System settings</div>
-
-  <div class="srow">
-    <div><div class="lab">Battery capacity</div><div class="hint">Per module, in kWh</div></div>
-    <input type="number" id="cfgCap" value="5.12" step="0.01" min="0.5" inputmode="decimal">
-  </div>
-  <div class="srow">
-    <div><div class="lab">Modules in bank</div><div class="hint">Parallel units on the same bus</div></div>
-    <input type="number" id="cfgUnits" value="1" step="1" min="1" inputmode="numeric">
-  </div>
-  <div class="srow">
-    <div><div class="lab">Nominal voltage</div><div class="hint">Used for current and C-rate</div></div>
-    <input type="number" id="cfgVolt" value="51.2" step="0.1" min="10" inputmode="decimal">
-  </div>
-  <div class="srow">
-    <div><div class="lab">Reserve floor</div><div class="hint">Stop discharging at this %</div></div>
-    <input type="number" id="cfgFloor" value="15" step="1" min="0" max="90" inputmode="numeric">
-  </div>
-  <div class="srow">
-    <div><div class="lab">Inverter efficiency</div><div class="hint">DC to AC losses on the load side</div></div>
-    <input type="number" id="cfgInv" value="92" step="1" min="50" max="100" inputmode="numeric">
-  </div>
-  <div class="srow">
-    <div><div class="lab">Charge efficiency</div><div class="hint">Losses into the battery</div></div>
-    <input type="number" id="cfgChg" value="90" step="1" min="50" max="100" inputmode="numeric">
-  </div>
-  <div class="srow">
-    <div><div class="lab">Model absorption taper</div><div class="hint">Slows the last 10% like a real BMS does</div></div>
-    <div class="toggle on" id="cfgTaper" role="switch" aria-checked="true" tabindex="0"><i></i></div>
-  </div>
-
-  <button class="btn primary" id="btnCloseSheet" style="margin-top:16px">Done</button>
+  <div class="eyebrow" style="margin-bottom:4px">System settings</div>
+  <div class="srow"><div><div class="lab">Battery capacity</div><div class="hint2">Per module, kWh</div></div><input type="number" id="cfgCap" value="5.12" step="0.01" min="0.5" inputmode="decimal"></div>
+  <div class="srow"><div><div class="lab">Modules in bank</div><div class="hint2">Parallel units on the bus</div></div><input type="number" id="cfgUnits" value="1" step="1" min="1" inputmode="numeric"></div>
+  <div class="srow"><div><div class="lab">Nominal voltage</div><div class="hint2">For current and C-rate</div></div><input type="number" id="cfgVolt" value="51.2" step="0.1" min="10" inputmode="decimal"></div>
+  <div class="srow"><div><div class="lab">Reserve floor</div><div class="hint2">Stop discharging here</div></div><input type="number" id="cfgFloor" value="15" step="1" min="0" max="90" inputmode="numeric"></div>
+  <div class="srow"><div><div class="lab">Inverter efficiency</div><div class="hint2">DC to AC loss on the load side</div></div><input type="number" id="cfgInv" value="92" step="1" min="50" max="100" inputmode="numeric"></div>
+  <div class="srow"><div><div class="lab">Charge efficiency</div><div class="hint2">Loss going into the battery</div></div><input type="number" id="cfgChg" value="90" step="1" min="50" max="100" inputmode="numeric"></div>
+  <div class="srow"><div><div class="lab">Model absorption taper</div><div class="hint2">Slows the last 10%, like the BMS does</div></div><div class="toggle on" id="cfgTaper" role="switch" aria-checked="true" tabindex="0"><i></i></div></div>
+  <button class="btn primary" id="btnDone" style="margin-top:16px">Done</button>
 </div>
-
 <div class="toast" id="toast">Copied</div>
 
 <script>
 (function(){
-  "use strict";
+"use strict";
+var $=function(i){return document.getElementById(i)};
+var cfg={cap:5.12,units:1,volt:51.2,floor:15,inv:92,chg:90,taper:true};
+var st={soc:62,load:540,pv:2600};
+var view="home";
 
-  var cfg = { cap:5.12, units:1, volt:51.2, floor:15, inv:92, chg:90, taper:true };
-  var st  = { soc:62, load:540, pv:0 };
+function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+function num(v,d){v=parseFloat(v);return isFinite(v)?v:d}
+function capWh(){return cfg.cap*1000*cfg.units}
+function ah(){return capWh()/cfg.volt}
+function fmtDur(h){
+  if(!isFinite(h)||h<=0)return "0 m";
+  if(h>=48)return "48 h+";
+  var H=Math.floor(h),M=Math.round((h-H)*60);
+  if(M===60){H++;M=0}
+  return H===0?M+" m":H+" h "+(M<10?"0":"")+M+" m";
+}
+function clockIn(h){
+  var d=new Date(),base=d.getDate();
+  d.setMinutes(d.getMinutes()+Math.round(h*60));
+  var hh=d.getHours(),mm=String(d.getMinutes());
+  if(mm.length<2)mm="0"+mm;
+  var ap=hh>=12?"PM":"AM";hh=hh%12||12;
+  return hh+":"+mm+" "+ap+(d.getDate()===base?"":" tomorrow");
+}
+function hLabel(d){var h=d.getHours(),ap=h>=12?"p":"a";h=h%12||12;return h+ap}
+function accept(w,soc){return (!cfg.taper||soc<=90)?w:w*(0.3+0.7*(100-soc)/10)}
 
-  var $ = function(id){ return document.getElementById(id); };
-
-  /* ---------- helpers ---------- */
-  function clamp(v,a,b){ return Math.min(b, Math.max(a, v)); }
-  function num(v,d){ v = parseFloat(v); return isFinite(v) ? v : d; }
-
-  function capWh(){ return cfg.cap * 1000 * cfg.units; }
-  function ah(){ return capWh() / cfg.volt; }
-
-  function fmtDur(h){
-    if(!isFinite(h) || h <= 0) return "0 m";
-    if(h >= 48) return "48 h+";
-    var H = Math.floor(h), M = Math.round((h - H) * 60);
-    if(M === 60){ H++; M = 0; }
-    return H === 0 ? M + " m" : H + " h " + M + " m";
+/* ---------- dial ---------- */
+var CX=130,CY=130,R=104,START=135,SWEEP=270,NT=60;
+function polar(r,deg){var a=deg*Math.PI/180;return[CX+r*Math.cos(a),CY+r*Math.sin(a)]}
+function buildDial(){
+  var g='<g class="rot" opacity=".55">';
+  for(var k=0;k<48;k++){var a=k*7.5,p1=polar(121,a),p2=polar(126,a);
+    g+='<line x1="'+p1[0].toFixed(1)+'" y1="'+p1[1].toFixed(1)+'" x2="'+p2[0].toFixed(1)+'" y2="'+p2[1].toFixed(1)+'" stroke="#152230" stroke-width="1.5"/>'}
+  g+='</g><circle cx="130" cy="130" r="72" fill="none" stroke="#0d1723"/>';
+  for(var i=0;i<NT;i++){
+    var deg=START+(i+0.5)/NT*SWEEP,a=polar(R-16,deg),b=polar(R,deg);
+    g+='<line id="tk'+i+'" x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="#16222f" stroke-width="4" stroke-linecap="round"/>'}
+  g+='<circle id="knob" cx="0" cy="0" r="6.5" fill="var(--accent)" stroke="#000308" stroke-width="3"/>';
+  $("dial").innerHTML=g;
+}
+function paintDial(){
+  var on=Math.round(st.soc/100*NT),low=st.soc<=cfg.floor;
+  for(var i=0;i<NT;i++){
+    var t=$("tk"+i),pct=(i+1)/NT*100,lit=i<on;
+    t.setAttribute("stroke",!lit?"#16222f":(pct<=cfg.floor||low)?"var(--red)":"var(--cyan)");
   }
-  function fmtClock(h){
-    var d = new Date();
-    var base = d.getDate();
-    d.setMinutes(d.getMinutes() + Math.round(h * 60));
-    var hh = d.getHours(), mm = String(d.getMinutes()).padStart(2,"0");
-    var ap = hh >= 12 ? "PM" : "AM";
-    hh = hh % 12 || 12;
-    var day = d.getDate() === base ? "today" : "tomorrow";
-    return hh + ":" + mm + " " + ap + " " + day;
-  }
-  function hhmm(d){
-    var hh = d.getHours(), ap = hh >= 12 ? "p" : "a";
-    hh = hh % 12 || 12;
-    return hh + ap;
-  }
+  var k=polar(R-8,START+st.soc/100*SWEEP);
+  $("knob").setAttribute("cx",k[0].toFixed(1));
+  $("knob").setAttribute("cy",k[1].toFixed(1));
+  $("dial").setAttribute("aria-valuenow",Math.round(st.soc));
+}
+function dialFromPoint(px,py){
+  var r=$("dial").getBoundingClientRect();
+  var x=(px-r.left)/r.width*260-CX,y=(py-r.top)/r.height*260-CY;
+  var deg=(Math.atan2(y,x)*180/Math.PI+360)%360;
+  var rel=(deg-START+360)%360;
+  if(rel>SWEEP)rel=(rel-SWEEP)<(360-rel)?SWEEP:0;
+  setSoc(rel/SWEEP*100);
+}
+function setSoc(v){st.soc=clamp(Math.round(v),0,100);render()}
+var dragging=false;
+$("dial").addEventListener("pointerdown",function(e){dragging=true;this.setPointerCapture(e.pointerId);dialFromPoint(e.clientX,e.clientY)});
+$("dial").addEventListener("pointermove",function(e){if(dragging)dialFromPoint(e.clientX,e.clientY)});
+$("dial").addEventListener("pointerup",function(){dragging=false});
+$("dial").addEventListener("pointercancel",function(){dragging=false});
+$("dial").addEventListener("keydown",function(e){
+  if(e.key==="ArrowRight"||e.key==="ArrowUp"){setSoc(st.soc+1);e.preventDefault()}
+  if(e.key==="ArrowLeft"||e.key==="ArrowDown"){setSoc(st.soc-1);e.preventDefault()}
+});
+$("nMinus").addEventListener("click",function(){setSoc(st.soc-1)});
+$("nPlus").addEventListener("click",function(){setSoc(st.soc+1)});
 
-  /* charge power actually accepted by the battery, tapering near full */
-  function accepted(pv, soc){
-    if(!cfg.taper || soc <= 90) return pv;
-    return pv * (0.3 + 0.7 * (100 - soc) / 10);
-  }
-  /* net watts into the battery (negative = draining) */
-  function netAt(soc){
-    return accepted(st.pv, soc) * (cfg.chg/100) - st.load / (cfg.inv/100);
-  }
-
-  /* step the state of charge forward; returns array of {t, soc} */
-  function simulate(hours, stepMin){
-    var soc = st.soc, out = [{t:0, soc:soc}];
-    var steps = Math.round(hours * 60 / stepMin), dt = stepMin / 60;
-    for(var i=1; i<=steps; i++){
-      soc = clamp(soc + netAt(soc) * dt / capWh() * 100, 0, 100);
-      out.push({ t:i * dt, soc:soc });
-    }
-    return out;
-  }
-
-  /* hours until the SoC crosses a target, or null */
-  function timeTo(target, up){
-    var soc = st.soc, dt = 1/60;
-    for(var i=1; i<=48*60; i++){
-      var prev = soc;
-      soc = clamp(soc + netAt(soc) * dt / capWh() * 100, 0, 100);
-      if(up ? soc >= target - 0.05 : soc <= target + 0.05) return i * dt;
-      if(Math.abs(soc - prev) < 1e-6) return null;
-    }
-    return null;
-  }
-
-  /* ---------- render ---------- */
-  var SEGS = 20;
-  function buildColumn(){
-    var col = $("column"); col.innerHTML = "";
-    for(var i=0;i<SEGS;i++){
-      var s = document.createElement("div");
-      s.className = "seg";
-      col.appendChild(s);
-    }
-  }
-
-  function render(){
-    var net = netAt(st.soc);
-    var draining = net < -1, filling = net > 1;
-    var accent = draining ? "var(--amber)" : (filling ? "var(--mint)" : "var(--cyan)");
-    document.documentElement.style.setProperty("--state", accent);
-    if(st.soc <= cfg.floor && !filling) document.documentElement.style.setProperty("--state","var(--red)");
-
-    /* column */
-    var segs = $("column").children, filled = Math.round(st.soc / 100 * SEGS);
-    for(var i=0;i<SEGS;i++){
-      var pctTop = (i+1) / SEGS * 100;
-      segs[i].className = "seg" + (pctTop <= cfg.floor ? " reserve" : "") + (i < filled ? " on" : "");
-    }
-
-    /* headline */
-    $("socBig").textContent = Math.round(st.soc);
-    $("bankLabel").textContent = (cfg.cap * cfg.units).toFixed(2).replace(/\.00$/,"") + " kWh · " + cfg.volt + " V";
-    var stateText = filling ? "Charging" : (draining ? "Discharging" : "Holding");
-    $("stateText").textContent = stateText;
-    $("statePill").textContent = stateText;
-    $("netText").textContent = (net >= 0 ? "+" : "−") + Math.round(Math.abs(net)) + " W";
-    var amps = Math.abs(net) / cfg.volt;
-    $("ampText").textContent = amps.toFixed(1) + " A";
-
-    /* ETA */
-    var label, dur, sub;
-    if(draining){
-      var h = timeTo(cfg.floor, false);
-      label = "Reaches " + cfg.floor + "% reserve";
-      dur = h === null ? "—" : fmtDur(h);
-      sub = h === null ? "load is too small to matter" : "around " + fmtClock(h);
-      if(st.soc <= cfg.floor){ label = "Below reserve floor"; dur = "Shed load"; sub = "running into the protected band"; }
-    } else if(filling){
-      var f = timeTo(100, true);
-      label = "Reaches 100% full";
-      dur = f === null ? "48 h+" : fmtDur(f);
-      sub = f === null ? "solar is barely ahead of the load" : "around " + fmtClock(f);
-    } else {
-      label = "Solar is matching the load";
-      dur = "Holding";
-      sub = "charge is flat at " + Math.round(st.soc) + "%";
-    }
-    $("etaLabel").textContent = label;
-    $("etaTime").textContent = dur;
-    $("etaClock").textContent = sub;
-
-    /* stats */
-    var usable = capWh() * Math.max(0, st.soc - cfg.floor) / 100 / 1000;
-    var toFull = capWh() * (100 - st.soc) / 100 / 1000;
-    $("statUsable").innerHTML = usable.toFixed(2) + '<span>kWh</span>';
-    $("statToFull").innerHTML = toFull.toFixed(2) + '<span>kWh</span>';
-    $("statAmp").innerHTML = amps.toFixed(1) + '<span>A</span>';
-    $("statC").innerHTML = (amps / ah()).toFixed(2) + '<span>C</span>';
-
-    var now = new Date();
-    $("clockNow").textContent = hhmm(now).replace("a"," AM").replace("p"," PM");
-
-    drawChart();
-    drawRuntime();
-    drawAlerts(net, amps, filling, draining);
-  }
-
-  /* ---------- chart ---------- */
-  function drawChart(){
-    var W = 600, H = 150, padL = 30, padR = 8, padT = 10, padB = 22;
-    var pts = simulate(12, 5);
-    var x = function(t){ return padL + (t/12) * (W - padL - padR); };
-    var y = function(s){ return padT + (1 - s/100) * (H - padT - padB); };
-
-    var line = pts.map(function(p,i){ return (i?"L":"M") + x(p.t).toFixed(1) + " " + y(p.soc).toFixed(1); }).join(" ");
-    var area = line + " L " + x(12).toFixed(1) + " " + y(0) + " L " + x(0).toFixed(1) + " " + y(0) + " Z";
-
-    var g = "";
-    /* reserve band */
-    g += '<rect x="'+padL+'" y="'+y(cfg.floor)+'" width="'+(W-padL-padR)+'" height="'+(y(0)-y(cfg.floor))+'" fill="rgba(255,93,93,.10)"/>';
-    g += '<line x1="'+padL+'" y1="'+y(cfg.floor)+'" x2="'+(W-padR)+'" y2="'+y(cfg.floor)+'" stroke="var(--red)" stroke-width="1" stroke-dasharray="4 4" opacity=".65"/>';
-    /* gridlines */
-    [100,50].forEach(function(v){
-      g += '<line x1="'+padL+'" y1="'+y(v)+'" x2="'+(W-padR)+'" y2="'+y(v)+'" stroke="#1c2a3a" stroke-width="1"/>';
-      g += '<text x="4" y="'+(y(v)+4)+'" fill="#4d5f73" font-size="10" font-family="ui-monospace,monospace">'+v+'</text>';
-    });
-    g += '<text x="4" y="'+(y(cfg.floor)+4)+'" fill="#ff5d5d" font-size="10" font-family="ui-monospace,monospace" opacity=".8">'+cfg.floor+'</text>';
-    /* hour ticks */
-    var base = new Date();
-    for(var t=0;t<=12;t+=3){
-      var d = new Date(base.getTime() + t*3600*1000);
-      g += '<text x="'+x(t)+'" y="'+(H-6)+'" fill="#4d5f73" font-size="10" font-family="ui-monospace,monospace" text-anchor="'+(t===0?"start":(t===12?"end":"middle"))+'">'+hhmm(d)+'</text>';
-    }
-    /* curve */
-    g += '<path d="'+area+'" fill="var(--state)" opacity=".10"/>';
-    g += '<path d="'+line+'" fill="none" stroke="var(--state)" stroke-width="2.2" stroke-linejoin="round"/>';
-    g += '<circle cx="'+x(0)+'" cy="'+y(st.soc)+'" r="4" fill="var(--state)"/>';
-    $("chart").innerHTML = g;
-
-    var end = pts[pts.length-1].soc;
-    $("horizonNote").textContent = "ends near " + Math.round(end) + "%";
-  }
-
-  /* ---------- runtime table ---------- */
-  function drawRuntime(){
-    var loads = [200, 500, 1000, 1500, 2000, 3000];
-    if(loads.indexOf(Math.round(st.load)) === -1 && st.load > 0) loads.push(Math.round(st.load));
-    loads.sort(function(a,b){ return a-b; });
-
-    var usableWh = capWh() * Math.max(0, st.soc - cfg.floor) / 100;
-    var rows = loads.map(function(L){
-      var draw = L / (cfg.inv/100);
-      var netW = accepted(st.pv, st.soc) * (cfg.chg/100) - draw;
-      var cell = netW >= -1
-        ? '<span style="color:var(--mint)">solar covers it</span>'
-        : fmtDur(usableWh / Math.abs(netW));
-      var isNow = Math.abs(L - st.load) < 1;
-      return '<tr class="'+(isNow?"now":"")+'"><td>'+L+' W</td><td style="color:var(--muted)">'+Math.round(draw)+' W</td><td>'+cell+'</td></tr>';
-    });
-    $("runtimeRows").innerHTML = rows.join("");
-  }
-
-  /* ---------- alerts ---------- */
-  function drawAlerts(net, amps, filling, draining){
-    var out = [], C = amps / ah();
-
-    if(st.soc <= cfg.floor && !filling){
-      out.push(['crit','Below reserve','Charge is at or under the '+cfg.floor+'% floor. Cut non-essential load or start the genset before the BMS trips.']);
-    } else if(draining && st.soc - cfg.floor < 10){
-      out.push(['warn','Close to reserve','Less than 10 points of charge left above the floor.']);
-    }
-    if(filling && C > 0.5){
-      out.push(['warn','High charge rate', Math.round(amps)+' A is '+C.toFixed(2)+'C. Most 100 Ah LFP modules want 0.5C or less on a continuous charge — check the Eastman spec sheet before running this all day.']);
-    }
-    if(draining && C > 1){
-      out.push(['warn','Heavy draw', Math.round(amps)+' A is above 1C. Fine in bursts, hard on the pack and the inverter if it is sustained.']);
-    }
-    if(st.load === 0 && st.pv === 0){
-      out.push(['ok','Nothing running','Set a load to see how long the bank holds, or set solar input to see how fast it fills.']);
-    }
-    if(filling && st.soc > 90 && cfg.taper){
-      out.push(['ok','Absorption stage','The last 10% always fills slower — the projection already accounts for that.']);
-    }
-
-    $("alerts").innerHTML = out.map(function(a){
-      return '<div class="alert '+a[0]+'"><div><b>'+a[1]+'</b>'+a[2]+'</div></div>';
-    }).join("");
-  }
-
-  /* ---------- inputs ---------- */
-  function bindPair(rangeId, numId, key, max){
-    var r = $(rangeId), n = $(numId);
-    function set(v, from){
-      v = clamp(num(v, st[key]), 0, max);
-      st[key] = v;
-      if(from !== "r") r.value = Math.min(v, parseFloat(r.max));
-      if(from !== "n") n.value = Math.round(v * 100) / 100;
-      syncChips();
-      render();
-    }
-    r.addEventListener("input", function(){ set(r.value, "r"); });
-    n.addEventListener("input", function(){ set(n.value, "n"); });
-    n.addEventListener("blur", function(){ set(n.value); });
-  }
-
-  var LOAD_CHIPS = [0, 250, 500, 1000, 1500, 2000];
-  var PV_CHIPS   = [0, 600, 1200, 1800, 2600, 3300];
-  function buildChips(){
-    function make(host, values, key, rangeId, numId){
-      $(host).innerHTML = values.map(function(v){
-        return '<button class="chip" data-v="'+v+'">'+v+' W</button>';
-      }).join("");
-      $(host).addEventListener("click", function(e){
-        var b = e.target.closest(".chip"); if(!b) return;
-        st[key] = parseFloat(b.dataset.v);
-        $(rangeId).value = st[key];
-        $(numId).value = st[key];
-        syncChips(); render();
-      });
-    }
-    make("loadChips", LOAD_CHIPS, "load", "load", "loadNum");
-    make("pvChips", PV_CHIPS, "pv", "pv", "pvNum");
-  }
-  function syncChips(){
-    [["loadChips","load"],["pvChips","pv"]].forEach(function(p){
-      Array.prototype.forEach.call($(p[0]).children, function(c){
-        c.classList.toggle("sel", parseFloat(c.dataset.v) === st[p[1]]);
-      });
-    });
-  }
-
-  /* settings */
-  function bindCfg(id, key, min, max){
-    $(id).addEventListener("input", function(){
-      cfg[key] = clamp(num($(id).value, cfg[key]), min, max);
-      render();
-    });
-  }
-  bindCfg("cfgCap","cap",0.5,500);
-  bindCfg("cfgUnits","units",1,100);
-  bindCfg("cfgVolt","volt",10,1000);
-  bindCfg("cfgFloor","floor",0,90);
-  bindCfg("cfgInv","inv",50,100);
-  bindCfg("cfgChg","chg",50,100);
-  $("cfgTaper").addEventListener("click", function(){
-    cfg.taper = !cfg.taper;
-    this.classList.toggle("on", cfg.taper);
-    this.setAttribute("aria-checked", String(cfg.taper));
-    render();
-  });
-
-  function openSheet(v){
-    $("sheet").classList.toggle("open", v);
-    $("scrim").classList.toggle("open", v);
-  }
-  $("btnSettings").addEventListener("click", function(){ openSheet(true); });
-  $("scrim").addEventListener("click", function(){ openSheet(false); });
-  $("btnCloseSheet").addEventListener("click", function(){ openSheet(false); });
-  document.addEventListener("keydown", function(e){ if(e.key === "Escape") openSheet(false); });
-
-  $("btnReset").addEventListener("click", function(){
-    st = { soc:50, load:500, pv:0 };
-    $("soc").value = 50; $("socNum").value = 50;
-    $("load").value = 500; $("loadNum").value = 500;
-    $("pv").value = 0; $("pvNum").value = 0;
-    syncChips(); render();
-  });
-
-  $("btnCopy").addEventListener("click", function(){
-    var line = "Battery " + Math.round(st.soc) + "% · load " + Math.round(st.load) + " W · solar "
-      + Math.round(st.pv) + " W · " + $("stateText").textContent.toLowerCase()
-      + " · " + $("etaLabel").textContent.toLowerCase() + " in " + $("etaTime").textContent
-      + " (" + $("etaClock").textContent.replace("around ","") + ")";
-    var done = function(){
-      var t = $("toast"); t.classList.add("show");
-      setTimeout(function(){ t.classList.remove("show"); }, 1400);
-    };
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(line).then(done, done);
-    } else {
-      var ta = document.createElement("textarea");
-      ta.value = line; document.body.appendChild(ta); ta.select();
-      try { document.execCommand("copy"); } catch(err){}
-      document.body.removeChild(ta); done();
-    }
-  });
-
-  buildColumn();
-  buildChips();
-  bindPair("soc","socNum","soc",100);
-  bindPair("load","loadNum","load",10000);
-  bindPair("pv","pvNum","pv",10000);
-  syncChips();
+/* ---------- nav ---------- */
+function go(v){
+  view=v;
+  $("scHome").classList.toggle("active",v==="home");
+  $("scDis").classList.toggle("active",v==="dis");
+  $("scChg").classList.toggle("active",v==="chg");
+  $("btnBack").classList.toggle("show",v!=="home");
+  var s=document.documentElement.style;
+  if(v==="dis"){s.setProperty("--accent","#ff9236");$("hTitle").textContent="Discharging";$("hSub").textContent="Runtime to reserve floor"}
+  else if(v==="chg"){s.setProperty("--accent","#2bffb0");$("hTitle").textContent="Charging";$("hSub").textContent="Time to a full bank"}
+  else{s.setProperty("--accent","#00e0ff");$("hTitle").textContent="Peanuts Solar"}
+  window.scrollTo(0,0);
   render();
-  setInterval(render, 60000); /* keep the clock ETAs honest */
+}
+$("goDischarge").addEventListener("click",function(){go("dis")});
+$("goCharge").addEventListener("click",function(){go("chg")});
+$("btnBack").addEventListener("click",function(){go("home")});
+$("dHome").addEventListener("click",function(){go("home")});
+$("cHome").addEventListener("click",function(){go("home")});
+
+/* ---------- inputs ---------- */
+function pair(rangeId,numId,key,max){
+  var r=$(rangeId),n=$(numId);
+  function set(v,from){
+    v=clamp(num(v,st[key]),0,max);st[key]=v;
+    if(from!=="r")r.value=Math.min(v,parseFloat(r.max));
+    if(from!=="n")n.value=Math.round(v);
+    render();
+  }
+  r.addEventListener("input",function(){set(r.value,"r")});
+  n.addEventListener("input",function(){set(n.value,"n")});
+}
+function chips(host,vals,key,rangeId,numId){
+  $(host).innerHTML=vals.map(function(v){return '<button class="chip" data-v="'+v+'">'+v+' W</button>'}).join("");
+  $(host).addEventListener("click",function(e){
+    var b=e.target.closest(".chip");if(!b)return;
+    st[key]=parseFloat(b.getAttribute("data-v"));
+    $(rangeId).value=st[key];$(numId).value=st[key];render();
+  });
+}
+chips("dChips",[250,500,800,1200,2000,3000],"load","dLoad","dLoadNum");
+chips("cChips",[600,1200,1800,2600,3300,4500],"pv","cWatt","cWattNum");
+pair("dLoad","dLoadNum","load",20000);
+pair("cWatt","cWattNum","pv",20000);
+function paintChips(){
+  [["dChips","load"],["cChips","pv"]].forEach(function(p){
+    Array.prototype.forEach.call($(p[0]).children,function(c){
+      c.classList.toggle("sel",parseFloat(c.getAttribute("data-v"))===st[p[1]]);
+    });
+  });
+}
+
+/* ---------- chart ---------- */
+function drawCurve(svgId,pts,horizon,floorLine,color){
+  var W=600,H=158,pl=30,pr=10,pt=12,pb=22;
+  var x=function(t){return pl+(t/horizon)*(W-pl-pr)},y=function(s){return pt+(1-s/100)*(H-pt-pb)};
+  var line=pts.map(function(p,i){return (i?"L":"M")+x(p.t).toFixed(1)+" "+y(p.s).toFixed(1)}).join(" ");
+  var last=pts[pts.length-1];
+  var area=line+" L "+x(last.t).toFixed(1)+" "+y(0)+" L "+x(0).toFixed(1)+" "+y(0)+" Z";
+  var g="";
+  if(floorLine!==null){
+    g+='<rect x="'+pl+'" y="'+y(floorLine)+'" width="'+(W-pl-pr)+'" height="'+(y(0)-y(floorLine))+'" fill="rgba(255,77,109,.10)"/>';
+    g+='<line x1="'+pl+'" y1="'+y(floorLine)+'" x2="'+(W-pr)+'" y2="'+y(floorLine)+'" stroke="#ff4d6d" stroke-width="1" stroke-dasharray="4 4" opacity=".7"/>';
+    g+='<text x="4" y="'+(y(floorLine)+4)+'" fill="#ff4d6d" font-size="10" font-family="ui-monospace,monospace">'+floorLine+'</text>';
+  }
+  [100,50].forEach(function(v){
+    g+='<line x1="'+pl+'" y1="'+y(v)+'" x2="'+(W-pr)+'" y2="'+y(v)+'" stroke="#152230"/>';
+    g+='<text x="4" y="'+(y(v)+4)+'" fill="#455a72" font-size="10" font-family="ui-monospace,monospace">'+v+'</text>';
+  });
+  var now=new Date();
+  for(var i=0;i<=4;i++){
+    var t=horizon*i/4,d=new Date(now.getTime()+t*3600000);
+    g+='<text x="'+x(t).toFixed(1)+'" y="'+(H-6)+'" fill="#455a72" font-size="10" font-family="ui-monospace,monospace" text-anchor="'+(i===0?"start":i===4?"end":"middle")+'">'+hLabel(d)+'</text>';
+  }
+  g+='<path d="'+area+'" fill="'+color+'" opacity=".11"/>';
+  g+='<path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  g+='<circle cx="'+x(0)+'" cy="'+y(st.soc)+'" r="4.5" fill="'+color+'"/>';
+  $(svgId).innerHTML=g;
+}
+
+/* ---------- discharge ---------- */
+function renderDischarge(){
+  var draw=st.load/(cfg.inv/100);
+  var usableWh=capWh()*Math.max(0,st.soc-cfg.floor)/100;
+  var hours=draw>0?usableWh/draw:Infinity;
+  var amps=draw/cfg.volt,C=amps/ah();
+
+  $("dFloorLbl").textContent=cfg.floor+"%";
+  $("dSocEcho").textContent="at "+Math.round(st.soc)+"%";
+  if(st.soc<=cfg.floor){$("dBig").textContent="At the floor";$("dSub").innerHTML="Charge is already at or below <b>"+cfg.floor+"%</b>"}
+  else if(draw<=0){$("dBig").textContent="—";$("dSub").innerHTML="Enter the load that is actually running"}
+  else{$("dBig").textContent=fmtDur(hours);$("dSub").innerHTML="Hits the floor around <b>"+clockIn(hours)+"</b>"}
+
+  $("dUsable").innerHTML=(usableWh/1000).toFixed(2)+"<i>kWh</i>";
+  $("dDraw").innerHTML=Math.round(draw)+"<i>W</i>";
+  $("dAmp").innerHTML=amps.toFixed(1)+"<i>A</i>";
+  $("dC").innerHTML=C.toFixed(2)+"<i>C</i>";
+
+  var horizon=clamp(isFinite(hours)&&hours>0?hours*1.35:12,1,24),pts=[];
+  for(var i=0;i<=120;i++){var t=horizon*i/120;pts.push({t:t,s:clamp(st.soc-(draw*t)/capWh()*100,0,100)})}
+  drawCurve("dChart",pts,horizon,cfg.floor,"#ff9236");
+
+  var loads=[250,500,1000,1500,2000,3000];
+  if(st.load>0&&loads.indexOf(Math.round(st.load))===-1)loads.push(Math.round(st.load));
+  loads.sort(function(a,b){return a-b});
+  $("dRows").innerHTML=loads.map(function(L){
+    var dr=L/(cfg.inv/100);
+    return '<tr class="'+(Math.abs(L-st.load)<1?"now":"")+'"><td>'+L+' W</td><td style="color:var(--muted)">'+Math.round(dr)+' W</td><td>'+fmtDur(usableWh/dr)+'</td></tr>';
+  }).join("");
+
+  var a=[];
+  if(st.soc<=cfg.floor)a.push(["crit","Below reserve","Cut non-essential load or switch over before the BMS trips."]);
+  else if(st.soc-cfg.floor<10)a.push(["warn","Close to reserve","Under 10 points of charge left above the floor."]);
+  if(C>1)a.push(["warn","Heavy draw",Math.round(amps)+" A is "+C.toFixed(2)+"C. Fine in bursts, hard on the pack if it stays there."]);
+  if(st.load===0)a.push(["ok","Nothing running","Set the load to project runtime."]);
+  $("dAlerts").innerHTML=a.map(function(x){return '<div class="alert '+x[0]+'"><div><b>'+x[1]+'</b>'+x[2]+'</div></div>'}).join("");
+}
+
+/* ---------- charge ---------- */
+function chargeSim(){
+  var s=st.soc,dt=1/60,out=[{t:0,s:s}],marks={},targets=[50,80,95,100];
+  for(var i=1;i<=48*60;i++){
+    var into=accept(st.pv,s)*(cfg.chg/100);
+    if(into<=0)break;
+    var prev=s;
+    s=clamp(s+into*dt/capWh()*100,0,100);
+    for(var j=0;j<targets.length;j++){var T=targets[j];if(marks[T]===undefined&&prev<T&&s>=T-0.001)marks[T]=i*dt}
+    if(i%5===0)out.push({t:i*dt,s:s});
+    if(s>=99.999){out.push({t:i*dt,s:s});break}
+  }
+  return {pts:out,marks:marks};
+}
+function renderCharge(){
+  var into=accept(st.pv,st.soc)*(cfg.chg/100);
+  var room=capWh()*(100-st.soc)/100;
+  var amps=into/cfg.volt,C=amps/ah();
+  var sim=chargeSim(),full=sim.marks[100];
+
+  $("cSocEcho").textContent="at "+Math.round(st.soc)+"%";
+  if(st.soc>=100){$("cBig").textContent="Full";$("cSub").innerHTML="Bank is at <b>100%</b>"}
+  else if(st.pv<=0){$("cBig").textContent="—";$("cSub").innerHTML="Enter what the charger is putting out"}
+  else if(full===undefined){$("cBig").textContent="48 h+";$("cSub").innerHTML="Input is too small to fill the bank"}
+  else{$("cBig").textContent=fmtDur(full);$("cSub").innerHTML="Full around <b>"+clockIn(full)+"</b>"}
+
+  $("cRoom").innerHTML=(room/1000).toFixed(2)+"<i>kWh</i>";
+  $("cInto").innerHTML=Math.round(into)+"<i>W</i>";
+  $("cAmp").innerHTML=amps.toFixed(1)+"<i>A</i>";
+  $("cC").innerHTML=C.toFixed(2)+"<i>C</i>";
+
+  var horizon=clamp(full!==undefined?full*1.25:8,1,24);
+  var vis=sim.pts.filter(function(p){return p.t<=horizon});
+  if(vis.length<2)vis=[{t:0,s:st.soc},{t:horizon,s:st.soc}];
+  drawCurve("cChart",vis,horizon,null,"#2bffb0");
+
+  var rows=[50,80,95,100].filter(function(T){return T>st.soc}).map(function(T){
+    var h=sim.marks[T];
+    return '<tr class="'+(T===100?"now":"")+'"><td>'+T+'%</td><td style="color:var(--muted)">'+(h===undefined?"—":fmtDur(h))+'</td><td>'+(h===undefined?"—":clockIn(h))+'</td></tr>';
+  });
+  $("cRows").innerHTML=rows.length?rows.join(""):'<tr><td colspan="3" style="color:var(--muted)">Bank is already full</td></tr>';
+
+  var a=[];
+  if(st.pv>0&&C>0.5)a.push(["warn","High charge rate",Math.round(amps)+" A is "+C.toFixed(2)+"C. Most 100 Ah LFP modules want 0.5C or less continuous — check the Eastman spec before running this all day."]);
+  if(st.pv>0&&st.soc>90&&cfg.taper)a.push(["ok","Absorption stage","The last 10% always fills slower. The projection already allows for that."]);
+  if(st.pv===0)a.push(["ok","No input","Set the charger output to project a fill time."]);
+  $("cAlerts").innerHTML=a.map(function(x){return '<div class="alert '+x[0]+'"><div><b>'+x[1]+'</b>'+x[2]+'</div></div>'}).join("");
+}
+
+/* ---------- home ---------- */
+function renderHome(){
+  paintDial();
+  $("dialPct").innerHTML=Math.round(st.soc)+"<i>%</i>";
+  $("dialWh").textContent=(capWh()*st.soc/100/1000).toFixed(2)+" kWh in the bank";
+  $("bsCap").textContent=(cfg.cap*cfg.units).toFixed(2)+" kWh";
+  $("bsUsable").textContent=(capWh()*Math.max(0,st.soc-cfg.floor)/100/1000).toFixed(2)+" kWh";
+  $("bsFloor").textContent=cfg.floor+"%";
+  $("bsRoom").textContent=(capWh()*(100-st.soc)/100/1000).toFixed(2)+" kWh";
+  $("goCharge").disabled=st.soc>=100;
+  $("goDischarge").disabled=st.soc<=0;
+  if(view==="home")$("hSub").textContent="Eastman "+(cfg.cap*cfg.units).toFixed(2)+" kWh · "+cfg.volt+" V";
+}
+
+function render(){
+  paintChips();
+  renderHome();
+  if(view==="dis")renderDischarge();
+  if(view==="chg")renderCharge();
+}
+
+/* ---------- settings ---------- */
+function bindCfg(id,key,min,max){
+  $(id).addEventListener("input",function(){cfg[key]=clamp(num($(id).value,cfg[key]),min,max);render()});
+}
+bindCfg("cfgCap","cap",0.5,500);bindCfg("cfgUnits","units",1,100);bindCfg("cfgVolt","volt",10,1000);
+bindCfg("cfgFloor","floor",0,90);bindCfg("cfgInv","inv",50,100);bindCfg("cfgChg","chg",50,100);
+$("cfgTaper").addEventListener("click",function(){
+  cfg.taper=!cfg.taper;this.classList.toggle("on",cfg.taper);
+  this.setAttribute("aria-checked",String(cfg.taper));render();
+});
+function sheet(v){$("sheet").classList.toggle("open",v);$("scrim").classList.toggle("open",v)}
+$("btnSettings").addEventListener("click",function(){sheet(true)});
+$("scrim").addEventListener("click",function(){sheet(false)});
+$("btnDone").addEventListener("click",function(){sheet(false)});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")sheet(false)});
+
+/* ---------- copy ---------- */
+function copy(text){
+  var done=function(){var t=$("toast");t.classList.add("show");setTimeout(function(){t.classList.remove("show")},1400)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,done)}
+  else{var ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy")}catch(e){}document.body.removeChild(ta);done()}
+}
+$("dCopy").addEventListener("click",function(){
+  copy("Battery "+Math.round(st.soc)+"% · load "+Math.round(st.load)+" W · "+$("dBig").textContent+" to the "+cfg.floor+"% floor ("+$("dSub").textContent.replace("Hits the floor around ","")+")");
+});
+$("cCopy").addEventListener("click",function(){
+  copy("Battery "+Math.round(st.soc)+"% · charging at "+Math.round(st.pv)+" W · full in "+$("cBig").textContent+" ("+$("cSub").textContent.replace("Full around ","")+")");
+});
+
+buildDial();
+go("home");
+setInterval(render,60000);
 })();
 </script>
 </body>
